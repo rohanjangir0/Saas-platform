@@ -6,6 +6,8 @@ const cors = require("cors");
 dotenv.config();
 const app = express();
 
+app.use(cors());  // allows everything
+
 
 app.use(express.json());
 
