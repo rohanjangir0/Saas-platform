@@ -6,20 +6,26 @@ const cors = require("cors");
 dotenv.config();
 const app = express();
 
-app.use(cors());  // allows everything
+// Middleware
+app.use(cors());        // allow all origins
+app.use(express.json()); // parse JSON request bodies
 
-
-app.use(express.json());
-
-
+// Routes
 const authRouter = require("./src/routes/auth");
-const leavesRouter = require("./src/routes/leaves"); 
+const leavesRouter = require("./src/routes/leaves");
+const employeeRoutes = require("./src/routes/employeeRoutes");
 
+// Register routes
+app.use("/api/employees", employeeRoutes); // employee login/add
+app.use("/api/auth", authRouter);
+app.use("/api/leaves", leavesRouter);
 
-app.use("/api/auth", authRouter);          
-app.use("/api/leaves", leavesRouter);      
+// Catch-all 404 for unregistered routes
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
 
-// Connect DB
+// Connect to MongoDB and start server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
