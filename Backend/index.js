@@ -15,6 +15,11 @@ const authRouter = require("./src/routes/auth");
 const leavesRouter = require("./src/routes/leaves");
 const employeeRoutes = require("./src/routes/employeeRoutes");
 const taskRoutes = require("./src/routes/taskRoutes");
+const announcementRoutes = require('./src/routes/announcementRoutes')
+
+// other middleware like cors, json, etc.
+app.use("/api/announcements", announcementRoutes);
+
 app.use("/api/tasks", taskRoutes);
 
 // Register routes
