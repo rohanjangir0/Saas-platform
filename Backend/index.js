@@ -14,11 +14,16 @@ app.use(express.json()); // parse JSON request bodies
 const authRouter = require("./src/routes/auth");
 const leavesRouter = require("./src/routes/leaves");
 const employeeRoutes = require("./src/routes/employeeRoutes");
+const taskRoutes = require("./src/routes/taskRoutes");
+app.use("/api/tasks", taskRoutes);
 
 // Register routes
 app.use("/api/employees", employeeRoutes); // employee login/add
 app.use("/api/auth", authRouter);
 app.use("/api/leaves", leavesRouter);
+const adminLeavesRouter = require("./src/routes/adminLeaveRoutes");
+app.use("/api/admin/leaves", adminLeavesRouter);
+
 
 // Catch-all 404 for unregistered routes
 app.use((req, res) => {
