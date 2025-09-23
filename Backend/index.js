@@ -27,6 +27,10 @@ const Message = require("./src/models/Message");
 
 // ✅ Create HTTP server
 const server = http.createServer(app);
+const adminLeaveRoutes = require("./src/routes/adminLeaveRoutes");
+
+// Admin leave routes
+app.use("/api/admin/leaves", adminLeaveRoutes);
 
 // ✅ Attach socket.io
 const io = new Server(server, {
