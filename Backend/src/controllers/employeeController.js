@@ -1,14 +1,12 @@
 const bcrypt = require("bcryptjs");
 const Employee = require("../models/Employee");
 
+// Add Employee (already exists)
 exports.addEmployee = async (req, res) => {
   try {
     const { name, email, phone, department } = req.body;
 
-    // Generate unique employeeId
     const employeeId = "EMP" + Date.now();
-
-    // Generate random password
     const rawPassword = Math.random().toString(36).slice(-8);
     const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
@@ -35,40 +33,24 @@ exports.addEmployee = async (req, res) => {
         employeeId,
         status: "Active",
       },
-      rawPassword, // send once to admin
+      rawPassword,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error", error });
   }
 };
-
-exports.getEmployees = async (req, res) => {
-  try {
-    const employees = await Employee.find().select("-password"); // hide password
-    res.status(200).json(employees);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server Error", error });
-  }
-};
+// Employee login
 exports.loginEmployee = async (req, res) => {
   try {
     const { employeeId, password } = req.body;
 
-    // Find employee by employeeId
     const employee = await Employee.findOne({ employeeId });
-    if (!employee) {
-      return res.status(404).json({ message: "Employee not found" });
-    }
+    if (!employee) return res.status(404).json({ message: "Employee not found" });
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, employee.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
+    if (!isMatch) return res.status(401).json({ message: "Invalid password" });
 
-    // Successful login
     res.status(200).json({
       message: "Login successful",
       employee: {
@@ -81,9 +63,54 @@ exports.loginEmployee = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: "Server Error", error });
   }
 };
 
-// controllers/taskController.js
 
+// Get Employees (already exists)
+exports.getEmployees = async (req, res) => {
+  try {
+    const employees = await Employee.find().select("-password"); // hide password
+    res.status(200).json(employees);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+// Update Employee
+exports.updateEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, phone, department, status } = req.body;
+
+    const updatedEmployee = await Employee.findByIdAndUpdate(
+      id,
+      { name, email, phone, department, status },
+      { new: true }
+    ).select("-password");
+
+    if (!updatedEmployee) return res.status(404).json({ message: "Employee not found" });
+
+    res.status(200).json(updatedEmployee);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
+
+// Delete Employee
+exports.deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await Employee.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ message: "Employee not found" });
+
+    res.status(200).json({ message: "Employee deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error", error });
+  }
+};
